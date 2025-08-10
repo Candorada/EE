@@ -3,6 +3,7 @@
 #include <cstdint>  // for uint8_t
 #include <chrono>
 #include <time.h>       /* time */
+#include <random>
 const int headerSize = 13;
 const int expectedMaxItems = 4;
 const int pageSize = headerSize+expectedMaxItems*sizeof(int)+expectedMaxItems*2*sizeof(int)+4; //1<<12;
@@ -433,7 +434,9 @@ class File{
 
 //main used to generate random data insert
 int main(){
-    srand(time(NULL));
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(INT_MIN,INT_MAX);
     File db("example.db");
     std::ofstream file2("data.csv", std::ios::app); //storing the data
     db.flush();
@@ -442,11 +445,11 @@ int main(){
     {
         int newItems = num*0.01;
         for (int i = 0; i < newItems; i++) {
-            db.insert(num);
+            db.insert(dis(gen)); //num
             num +=1;
         }
         auto start = std::chrono::high_resolution_clock::now();
-        db.insert(num);
+        db.insert(dis(gen)); //num
         auto end = std::chrono::high_resolution_clock::now();
         num +=1;
         double duration = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
