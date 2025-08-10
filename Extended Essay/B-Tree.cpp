@@ -366,6 +366,12 @@ class File{
     }
     void insert(int key){
         Page *page = findPageOf(key);
+        for(int i = 0; i < page->getItemCount(); i++){
+            if(page->data[i] == key){
+                std::cout << "key already exists" << std::endl;
+                return;
+            }
+        }
         //if(page->getItemCount() < maxSize){
               page->addItem(key,0);
               //(*page).print();
@@ -432,29 +438,29 @@ class File{
 };
 
 
-//main used to generate random data insert
+//main used to generate random data insert --currently broken
 int main(){
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(INT_MIN,INT_MAX);
+    std::uniform_int_distribution<> dis(0,100);
     File db("example.db");
     std::ofstream file2("data.csv", std::ios::app); //storing the data
     db.flush();
     int num = db.getTotalItems();
-    for (int a = 0; a < 1324; a++)
+    for (int a = 0; a < 20; a++)
     {
-        int newItems = num*0.01;
+        int newItems = 1;
         for (int i = 0; i < newItems; i++) {
             db.insert(dis(gen)); //num
             num +=1;
         }
-        auto start = std::chrono::high_resolution_clock::now();
-        db.insert(dis(gen)); //num
-        auto end = std::chrono::high_resolution_clock::now();
-        num +=1;
-        double duration = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
-        file2 << num <<","<< duration << std::endl;
-        std::cout << num <<","<< duration << std::endl;
+        // auto start = std::chrono::high_resolution_clock::now();
+        // db.insert(dis(gen)); //num
+        // auto end = std::chrono::high_resolution_clock::now();
+        // num +=1;
+        // double duration = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
+        // file2 << num <<","<< duration << std::endl;
+        // std::cout << num <<","<< duration << std::endl;
     }
     
     int r = db.getRootPageLocation();
@@ -462,7 +468,7 @@ int main(){
     std::cout << "pages:" << db.getPageCount() << std::endl;
     std::cout << "maxSize:"<<maxSize << std::endl; // maxsize
     std::cout << "Printing All" << std::endl;
-    //db.printAll(r);
+    db.printAll(r);
     std::cout << std::endl;
     std::cout << "item count: "<< num << std::endl;
     // double fileSize = db.getFileSize();
